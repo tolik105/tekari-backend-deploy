@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const { OpenAI } = require('openai');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,7 +10,10 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ Health check endpoint
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
 app.get('/api/test', (req, res) => {
   res.json({
     status: 'API is working!',
@@ -16,7 +21,6 @@ app.get('/api/test', (req, res) => {
   });
 });
 
-// ✅ Summarize endpoint
 app.post('/api/summarize', async (req, res) => {
   const content = req.body.content;
 
@@ -24,13 +28,26 @@ app.post('/api/summarize', async (req, res) => {
     return res.status(400).json({ error: 'Content is required.' });
   }
 
-  // Dummy response (later you can call OpenAI here)
-  const summary = `This is a summary of: ${content}`;
-  res.json({ summary });
+  try {
+    const chatResponse = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "You are a helpful assistant that summarizes user messages." },
+        { role: "user", content }
+      ],
+      temperature: 0.5
+    });
+
+    const summary = chatResponse.choices[0].message.content;
+    res.json({ summary });
+  } catch (error) {
+    console.error("OpenAI error:", error);
+    res.status(500).json({ error: "Failed to generate summary." });
+  }
 });
 
-// ✅ Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
