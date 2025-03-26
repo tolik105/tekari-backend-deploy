@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -9,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Health check route
+// ✅ Health check endpoint
 app.get('/api/test', (req, res) => {
   res.json({
     status: 'API is working!',
@@ -17,19 +16,21 @@ app.get('/api/test', (req, res) => {
   });
 });
 
-// Main summarize route
-app.post('/api/summarize', (req, res) => {
+// ✅ Summarize endpoint
+app.post('/api/summarize', async (req, res) => {
   const content = req.body.content;
+
   if (!content) {
     return res.status(400).json({ error: 'Content is required.' });
   }
 
-  // Mock summary logic for now
+  // Dummy response (later you can call OpenAI here)
   const summary = `This is a summary of: ${content}`;
   res.json({ summary });
 });
 
-// Start the server
+// ✅ Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
