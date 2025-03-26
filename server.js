@@ -14,6 +14,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+// Test endpoint
 app.get('/api/test', (req, res) => {
   res.json({
     status: 'API is working!',
@@ -21,6 +22,7 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Main AI Copilot endpoint
 app.post('/api/summarize', async (req, res) => {
   const content = req.body.content;
 
@@ -32,10 +34,17 @@ app.post('/api/summarize', async (req, res) => {
     const chatResponse = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
-        { role: "system", content: "You are a helpful assistant that summarizes user messages." },
-        { role: "user", content }
+        {
+          role: "system",
+          content:
+            "You are Tekari Copilot, a helpful AI assistant. Answer user questions clearly, summarize if needed, tell jokes, and provide professional yet friendly responses."
+        },
+        {
+          role: "user",
+          content
+        }
       ],
-      temperature: 0.5
+      temperature: 0.7
     });
 
     const summary = chatResponse.choices[0].message.content;
@@ -49,5 +58,6 @@ app.post('/api/summarize', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
